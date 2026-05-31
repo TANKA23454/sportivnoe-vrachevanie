@@ -1,0 +1,469 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: system-ui, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+}
+
+body {
+    background: #f4f7fc;
+    color: #1a2c3e;
+    line-height: 1.5;
+    padding: 1.5rem;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* ========= АВТОРИЗАЦИЯ ========= */
+.auth-container {
+    max-width: 480px;
+    margin: 3rem auto;
+    background: white;
+    border-radius: 2rem;
+    padding: 2rem;
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.05);
+}
+
+.auth-title {
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, #1b7f6e, #2c9c8a);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.auth-sub {
+    color: #5f7f8c;
+    margin-bottom: 1.8rem;
+}
+
+.input-group {
+    margin-bottom: 1.2rem;
+}
+
+.input-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
+    color: #2c5a6e;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 1.2rem;
+    border: 1px solid #cfdfe8;
+    background: #fefefe;
+    font-size: 1rem;
+    transition: 0.2s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #1b7f6e;
+    box-shadow: 0 0 0 3px rgba(27, 127, 110, 0.1);
+}
+
+.auth-btn {
+    background: #1b7f6e;
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 3rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: 0.2s;
+}
+
+.auth-btn:hover {
+    background: #0e6253;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 1.2rem;
+    font-size: 0.9rem;
+}
+
+.auth-switch span {
+    color: #1b7f6e;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.error-message {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 0.7rem;
+    border-radius: 1rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ========= ШАПКА ========= */
+.header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 1rem 1.8rem;
+    border-radius: 2rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03), 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.logo h1 {
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, #1b7f6e, #2c9c8a);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.logo p {
+    font-size: 0.75rem;
+    color: #5f7f8c;
+}
+
+.stats {
+    display: flex;
+    gap: 1.5rem;
+    background: #eef3f8;
+    padding: 0.5rem 1.2rem;
+    border-radius: 2rem;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-value {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: #1b7f6e;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #4a6a7a;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-greeting {
+    font-weight: 500;
+    background: #eef3f8;
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+}
+
+.logout-btn,
+.reset-btn {
+    background: none;
+    border: 1px solid #cbdbe0;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: 0.2s;
+    background: white;
+}
+
+.logout-btn:hover,
+.reset-btn:hover {
+    background: #f0f2f5;
+    border-color: #1b7f6e;
+    color: #1b7f6e;
+}
+
+/* ========= ЗАДАЧИ ========= */
+.tasks-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.filter-btn {
+    background: white;
+    border: none;
+    padding: 0.3rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.filter-btn.active {
+    background: #1b7f6e;
+    color: white;
+}
+
+.tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.task-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    border: 1px solid #e2edf2;
+}
+
+.task-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.08);
+}
+
+.task-badge {
+    display: inline-block;
+    background: #eef2fa;
+    padding: 0.2rem 0.8rem;
+    border-radius: 1rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #2c6b5e;
+    margin-bottom: 0.8rem;
+}
+
+.task-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.task-desc {
+    color: #4f6f7e;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.task-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.8rem;
+    border-top: 1px solid #e2edf2;
+    padding-top: 0.8rem;
+}
+
+.points {
+    font-weight: 700;
+    background: #f0f7f4;
+    padding: 0.2rem 0.7rem;
+    border-radius: 2rem;
+    font-size: 0.8rem;
+}
+
+.solved-badge {
+    background: #c8f0e6;
+    color: #176656;
+    padding: 0.2rem 0.7rem;
+    border-radius: 2rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.solved-badge.unsolved {
+    background: #eef2f5;
+    color: #4f6f7e;
+}
+
+/* ========= ДЕТАЛЬНЫЙ ПРОСМОТР ========= */
+.detail-view {
+    background: white;
+    border-radius: 2rem;
+    padding: 2rem;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    color: #1b7f6e;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    padding: 0.3rem 0;
+}
+
+.question-text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    background: #f8fbfd;
+    padding: 1.2rem;
+    border-radius: 1.5rem;
+    margin: 1rem 0 1.5rem 0;
+    border-left: 5px solid #2c9c8a;
+}
+
+.options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+.option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    background: #f9fcfd;
+    padding: 0.8rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid #e0edf2;
+    cursor: pointer;
+    transition: 0.1s;
+}
+
+.option.selected {
+    background: #e0f4ef;
+    border-color: #1b7f6e;
+    box-shadow: 0 2px 6px rgba(27, 127, 110, 0.1);
+}
+
+.option input {
+    margin-top: 0.2rem;
+    accent-color: #1b7f6e;
+}
+
+.option label {
+    flex: 1;
+    font-weight: 450;
+    cursor: pointer;
+}
+
+.submit-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.submit-btn {
+    background: #1b7f6e;
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 3rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background: #0e6253;
+}
+
+.submit-btn:disabled {
+    background: #b3cfc7;
+    cursor: not-allowed;
+}
+
+.feedback {
+    margin-top: 1.2rem;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.feedback.correct {
+    background: #dcfce7;
+    color: #14532d;
+    border-left: 4px solid #22c55e;
+}
+
+.feedback.wrong {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+}
+
+.explanation {
+    margin-top: 0.8rem;
+    font-size: 0.9rem;
+}
+
+.solved-info {
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    background: #c8f0e6;
+    border-radius: 2rem;
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #176656;
+}
+
+footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: #6c8b9a;
+    font-size: 0.75rem;
+}
+
+/* ========= АДАПТИВ ========= */
+@media (max-width: 680px) {
+    body {
+        padding: 1rem;
+    }
+
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .stats,
+    .user-info {
+        justify-content: center;
+    }
+
+    .tasks-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-view {
+        padding: 1.2rem;
+        margin: 0 0.5rem;
+    }
+}

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>MedSkills | Задачи</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="common.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo">
+            <h1>🏥 MedSkills</h1>
+            <p>клиническое мышление · интерактивные кейсы</p>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="totalPoints">0</div>
+                <div class="stat-label">очков</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="solvedCount">0</div>
+                <div class="stat-label">решено</div>
+            </div>
+        </div>
+        <div class="user-info">
+            <span class="user-greeting" id="userGreeting"></span>
+            <button class="logout-btn" id="logoutBtn">Выйти</button>
+            <button class="reset-btn" id="resetProgressBtn">⟳ Сброс</button>
+        </div>
+    </div>
+
+    <div class="tasks-header">
+        <h2>📚 Клинические задачи</h2>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">Все</button>
+            <button class="filter-btn" data-filter="cardiology">Кардиология</button>
+            <button class="filter-btn" data-filter="infectious">Инфекции</button>
+            <button class="filter-btn" data-filter="emergency">Неотложка</button>
+        </div>
+    </div>
+
+    <div class="tasks-grid" id="tasksGrid"></div>
+    <footer>⚕️ Интерактивный тренажер для врачей — решай кейсы, набирай очки и прокачивай навыки.</footer>
+</div>
+
+<script>
+const user = getCurrentUser();
+if (!user) {
+    window.location.href = "index.html";
+}
+
+document.getElementById("userGreeting").innerText = `${user.login} 👨‍⚕️`;
+
+let solvedIds = new Set(user.solvedTasks || []);
+let totalPoints = user.totalPoints || 0;
+let currentFilter = "all";
+
+function updateStats() {
+    document.getElementById("totalPoints").innerText = totalPoints;
+    document.getElementById("solvedCount").innerText = solvedIds.size;
+}
+updateStats();
+
+function saveProgress() {
+    saveUserProgress(user.login, Array.from(solvedIds), totalPoints);
+    user.solvedTasks = Array.from(solvedIds);
+    user.totalPoints = totalPoints;
+}
+
+function getFilteredTasks() {
+    if (currentFilter === "all") return TASKS;
+    return TASKS.filter(t => t.specialty === currentFilter);
+}
+
+function renderTasksGrid() {
+    const container = document.getElementById("tasksGrid");
+    const filtered = getFilteredTasks();
+    if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:2rem;">Нет задач по выбранной специальности</div>`;
+        return;
+    }
+    container.innerHTML = filtered.map(task => {
+        const isSolved = solvedIds.has(task.id);
+        const specialtyName = {
+            cardiology: "Кардиология",
+            infectious: "Инфекционные болезни",
+            emergency: "Неотложная помощь"
+        }[task.specialty] || "Клинический кейс";
+        return `
+            <div class="task-card" data-id="${task.id}">
+                <div class="task-badge">${specialtyName}</div>
+                <div class="task-title">${escapeHtml(task.title)}</div>
+                <div class="task-desc">${escapeHtml(task.shortDesc)}</div>
+                <div class="task-meta">
+                    <span class="points">⭐ ${task.points} очков</span>
+                    ${isSolved ? '<span class="solved-badge">✓ Решено</span>' : '<span class="solved-badge unsolved">Нерешено</span>'}
+                </div>
+            </div>
+        `;
+    }).join("");
+    document.querySelectorAll(".task-card").forEach(card => {
+        card.addEventListener("click", () => {
+            const id = card.getAttribute("data-id");
+            window.location.href = `detail.html?id=${id}`;
+        });
+    });
+}
+
+// Фильтры
+document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.getAttribute("data-filter");
+        renderTasksGrid();
+    });
+});
+
+// Выход
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    logout();
+});
+
+// Сброс прогресса
+document.getElementById("resetProgressBtn").addEventListener("click", () => {
+    if (confirm("Сбросить весь прогресс (все очки и решённые задачи)?")) {
+        solvedIds.clear();
+        totalPoints = 0;
+        saveProgress();
+        updateStats();
+        renderTasksGrid();
+    }
+});
+
+renderTasksGrid();
+</script>
+</body>
+</html>

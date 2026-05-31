@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>MedSkills | Решение задачи</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="common.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="detail-view">
+            <button class="back-button" id="backToListBtn">← Назад к задачам</button>
+            <div id="taskDetailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const user = getCurrentUser();
+        if (!user) {
+            window.location.href = "index.html";
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const taskId = parseInt(urlParams.get("id"));
+        const task = TASKS.find(t => t.id === taskId);
+
+        if (!task) {
+            document.getElementById("taskDetailContent").innerHTML = "<p style='color:red;'>Задача не найдена</p>";
+        }
+
+        let solvedIds = new Set(user.solvedTasks || []);
+        let totalPoints = user.totalPoints || 0;
+        let selectedOption = null;
+        let lastFeedback = null;
+
+        function saveProgress() {
+            saveUserProgress(user.login, Array.from(solvedIds), totalPoints);
+            user.solvedTasks = Array.from(solvedIds);
+            user.totalPoints = totalPoints;
+        }
+
+        function markSolved() {
+            if (solvedIds.has(task.id)) return false;
+            solvedIds.add(task.id);
+            totalPoints += task.points;
+            saveProgress();
+            renderTaskDetail();
+            return true;
+        }
+
+        function renderTaskDetail() {
+            const isAlreadySolved = solvedIds.has(task.id);
+            const container = document.getElementById("taskDetailContent");
+            const specialtyLabel = {
+                cardiology: "Кардиология",
+                infectious: "Инфекционные болезни",
+                emergency: "Неотложная помощь"
+            }[task.specialty] || "Задача";
+
+            let optionsHtml = task.options.map((opt, idx) => {
+                const isSelected = (selectedOption === opt);
+                return `
+            <div class="option ${isSelected ? 'selected' : ''}" data-opt-value="${escapeHtml(opt)}">
+                <input type="radio" name="taskOption" value="${escapeHtml(opt)}" id="opt_${idx}" ${isSelected ? 'checked' : ''}>
+                <label for="opt_${idx}">${escapeHtml(opt)}</label>
+            </div>
+        `;
+            }).join("");
+
+            let feedbackHtml = "";
+            if (lastFeedback) {
+                feedbackHtml = `
+            <div class="feedback ${lastFeedback.isCorrect ? 'correct' : 'wrong'}">
+                <strong>${lastFeedback.isCorrect ? "✅ Верно!" : "❌ Неверно"}</strong>
+                <div class="explanation">${escapeHtml(lastFeedback.message)}</div>
+            </div>
+        `;
+            }
+
+            const solvedBadge = isAlreadySolved ? `<div class="solved-info">🏆 Задача решена (+${task.points} очков)</div>` : "";
+
+            container.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:0.5rem;">
+            <h2 style="color:#1b7f6e;">${escapeHtml(task.title)}</h2>
+            <span class="points">⭐ ${task.points} баллов</span>
+        </div>
+        <div><span class="task-badge">${specialtyLabel}</span></div>
+        ${solvedBadge}
+        <div class="question-text">📖 ${escapeHtml(task.questionText)}</div>
+        <div class="options-list" id="optionsListDetail">${optionsHtml}</div>
+        <div class="submit-area">
+            <button class="submit-btn" id="submitAnswerBtn" ${isAlreadySolved ? 'disabled' : ''}>${isAlreadySolved ? 'Решено' : 'Проверить ответ'}</button>
+        </div>
+        ${feedbackHtml}
+    `;
+
+            // Привязка событий к опциям
+            document.querySelectorAll(".option").forEach(optDiv => {
+                const radio = optDiv.querySelector('input');
+                if (radio) {
+                    radio.addEventListener("change", () => {
+                        selectedOption = radio.value;
+                        document.querySelectorAll(".option").forEach(el => el.classList.remove("selected"));
+                        optDiv.classList.add("selected");
+                    });
+                    optDiv.addEventListener("click", () => {
+                        if (!radio.checked) {
+                            radio.checked = true;
+                            selectedOption = radio.value;
+                            document.querySelectorAll(".option").forEach(el => el.classList.remove("selected"));
+                            optDiv.classList.add("selected");
+                        }
+                    });
+                }
+            });
+
+            const submitBtn = document.getElementById("submitAnswerBtn");
+            if (submitBtn && !isAlreadySolved) {
+                submitBtn.addEventListener("click", () => {
+                    if (!selectedOption) {
+                        lastFeedback = { isCorrect: false, message: "Пожалуйста, выберите вариант ответа." };
+                        renderTaskDetail();
+                        return;
+                    }
+                    const isCorrect = (selectedOption === task.correctAnswer);
+                    if (isCorrect) {
+                        if (!solvedIds.has(task.id)) {
+                            markSolved();
+                            lastFeedback = { isCorrect: true, message: `${task.explanation} Вы получили ${task.points} очков!` };
+                        } else {
+                            lastFeedback = { isCorrect: true, message: `Вы уже решили эту задачу. ${task.explanation}` };
+                        }
+                    } else {
+                        lastFeedback = { isCorrect: false, message: `Неправильно. Правильный ответ: ${task.correctAnswer}. ${task.explanation}` };
+                    }
+                    renderTaskDetail();
+                });
+            }
+        }
+
+        document.getElementById("backToListBtn").addEventListener("click", () => {
+            window.location.href = "tasks.html";
+        });
+
+        renderTaskDetail();
+    </script>
+</body>
+
+</html>
