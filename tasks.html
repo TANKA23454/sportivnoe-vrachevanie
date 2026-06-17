@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Спортивное врачевание | Кейсы</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="common.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo">
+            <h1>🏥 Спортивное врачевание</h1>
+            <p>Тренажёр для врачей спортивных команд</p>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="totalPoints">0</div>
+                <div class="stat-label">очков</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="solvedCount">0</div>
+                <div class="stat-label">решено</div>
+            </div>
+        </div>
+        <div class="user-info">
+            <span class="user-greeting" id="userGreeting"></span>
+            <button class="logout-btn" id="logoutBtn">Выйти</button>
+            <button class="reset-btn" id="resetProgressBtn">⟳ Сброс</button>
+        </div>
+    </div>
+
+    <div class="tasks-header">
+        <h2>📋 Кейсы спортивной медицины</h2>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">Все</button>
+            <button class="filter-btn" data-filter="cardiology">Спорт. кардиология</button>
+            <button class="filter-btn" data-filter="traumatology">Спорт. травматология</button>
+            <button class="filter-btn" data-filter="emergency">Неотложка в спорте</button>
+        </div>
+    </div>
+
+    <!-- Блок с прогрессом -->
+    <div class="progress-widget">
+        <div class="progress-info">
+            <span>Общий прогресс</span>
+            <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+        </div>
+    </div>
+
+    <div class="tasks-grid" id="tasksGrid"></div>
+    <footer>⚕️ Решай кейсы спортивной медицины, набирай очки и повышай квалификацию.</footer>
+</div>
+
+<script>
+const user = getCurrentUser();
+if (!user) {
+    window.location.href = "index.html";
+}
+
+document.getElementById("userGreeting").innerText = `${user.login} 👨‍⚕️`;
+
+let solvedIds = new Set(user.solvedTasks || []);
+let totalPoints = user.totalPoints || 0;
+let currentFilter = "all";
+
+function updateStats() {
+    document.getElementById("totalPoints").innerText = totalPoints;
+    document.getElementById("solvedCount").innerText = solvedIds.size;
+    const progress = TASKS.length > 0 ? (solvedIds.size / TASKS.length) * 100 : 0;
+    document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
+    document.getElementById('progressFill').style.width = progress + '%';
+}
+updateStats();
+
+function saveProgress() {
+    saveUserProgress(user.login, Array.from(solvedIds), totalPoints);
+    user.solvedTasks = Array.from(solvedIds);
+    user.totalPoints = totalPoints;
+}
+
+function getFilteredTasks() {
+    if (currentFilter === "all") return TASKS;
+    return TASKS.filter(t => t.specialty === currentFilter);
+}
+
+function renderTasksGrid() {
+    const container = document.getElementById("tasksGrid");
+    const filtered = getFilteredTasks();
+    if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:2rem; color: var(--color-text-secondary);">Нет кейсов по выбранной специальности</div>`;
+        return;
+    }
+    container.innerHTML = filtered.map(task => {
+        const isSolved = solvedIds.has(task.id);
+        const specialtyLabels = {
+            cardiology: "Спорт. кардиология",
+            traumatology: "Спорт. травматология",
+            emergency: "Неотложка в спорте"
+        };
+        const specialtyColors = {
+            cardiology: "badge-cardiology",
+            traumatology: "badge-traumatology",
+            emergency: "badge-emergency"
+        };
+        return `
+            <div class="task-card" data-id="${task.id}">
+                <div class="task-badge ${specialtyColors[task.specialty] || ''}">${specialtyLabels[task.specialty] || task.specialty}</div>
+                <div class="task-title">${escapeHtml(task.title)}</div>
+                <div class="task-desc">${escapeHtml(task.shortDesc)}</div>
+                <div class="task-meta">
+                    <span class="points">⭐ ${task.points} баллов</span>
+                    <span class="solved-badge ${isSolved ? 'done' : 'pending'}">${isSolved ? '✅ Решено' : '⏳ Нерешено'}</span>
+                    <button class="btn-primary" onclick="location.href='detail.html?id=${task.id}'">
+                        ${isSolved ? '📖 Повторить' : '▶ Начать задачу'}
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+// Фильтры
+document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.getAttribute("data-filter");
+        renderTasksGrid();
+    });
+});
+
+// Выход
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    logout();
+});
+
+// Сброс прогресса
+document.getElementById("resetProgressBtn").addEventListener("click", () => {
+    if (confirm("Сбросить весь прогресс (все очки и решённые задачи)?")) {
+        solvedIds.clear();
+        totalPoints = 0;
+        saveProgress();
+        updateStats();
+        renderTasksGrid();
+    }
+});
+
+renderTasksGrid();
+</script>
+</body>
+</html>
